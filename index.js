@@ -104,8 +104,14 @@ app.get('/designations/:id', (req,res)=>{
     db.query(sql , [id] ,(err,result)=>{
     
         if(err) console.log(err);
-        
-        res.send(result);
+
+        //var obj=null;
+       for(var obj in result){
+            console.log(result[obj])
+           console.log(obj)
+            res.send(result[obj]);    
+        }
+        //res.send(result);
         
         })
    
@@ -114,7 +120,7 @@ app.get('/designations/:id', (req,res)=>{
     const id = req.params.id;
     console.log('Please Update this id from the database : ', id)
     const body = req.body;
-    const sql = "UPDATE  designation SET title=? WHERE designation_id=?"
+    const sql = "UPDATE  designation SET title=? WHERE designation_id=? limit 1"
     db.query(sql , [body.dTitle, id] ,(err,result)=>{
 
         if(err) console.log(err);
@@ -123,3 +129,61 @@ app.get('/designations/:id', (req,res)=>{
         
         })
 })
+app.get('/dept', (req, res) => {
+
+    const sql = "SELECT * FROM department"
+
+    db.query(sql, (err, result) => {
+
+        res.send(result);
+
+    })
+
+})
+app.get('/dept/:id', (req,res)=>{
+    const id = req.params.id;
+    const sql = "SELECT * FROM department WHERE department_id=?"
+    db.query(sql , [id] ,(err,result)=>{
+    
+        if(err) console.log(err);
+
+        //var obj=null;
+       for(var obj in result){
+            console.log(result[obj])
+           console.log(obj)
+            res.send(result[obj]);    
+        }
+        //res.send(result);
+        
+        })
+   
+  })
+  app.delete('/dept/:id',(req,res)=>{
+
+    const id = req.params.id;
+    console.log('please Delete id from database : ', id)
+    const sql="DELETE FROM department WHERE department_id=?"
+    
+    db.query(sql , [id] ,(err,result)=>{
+    
+    if(err) console.log(err);
+    
+    res.send(result);
+    
+    })
+    
+    })  
+
+    app.put('/dept/:id',(req,res)=>{
+        const id = req.params.id;
+        console.log('Please Update this id from the database : ', id)
+        const body = req.body;
+        const sql = "UPDATE  department SET title=? WHERE department_id=? limit 1"
+        db.query(sql , [body.deptTitle, id] ,(err,result)=>{
+    
+            if(err) console.log(err);
+            
+            res.send(result);
+            
+            })
+    })    

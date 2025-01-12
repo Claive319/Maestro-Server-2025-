@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 09, 2025 at 01:39 PM
+-- Generation Time: Jan 12, 2025 at 01:12 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -41,7 +41,7 @@ INSERT INTO `department` (`department_id`, `title`) VALUES
 (2, 'Management'),
 (3, 'Human Resources'),
 (4, 'Finance'),
-(5, 'Quality Assurance'),
+(5, 'Senior Quality Assurance'),
 (6, 'Engineering');
 
 -- --------------------------------------------------------
@@ -60,16 +60,12 @@ CREATE TABLE `designation` (
 --
 
 INSERT INTO `designation` (`designation_id`, `title`) VALUES
-(1, 'Software Engineer'),
+(1, 'Project Manager'),
 (2, 'HR'),
-(3, 'Software Engineer'),
+(3, 'Senior Engineer'),
 (4, 'HR'),
-(5, 'Accountant'),
-(6, 'Software Tester'),
-(7, 'Intern'),
-(8, 'Hello'),
-(9, 'Hello'),
-(10, 'Student');
+(5, 'Senior Accountant'),
+(7, 'Newest Intern');
 
 -- --------------------------------------------------------
 
@@ -119,13 +115,13 @@ ALTER TABLE `employees`
 -- AUTO_INCREMENT for table `department`
 --
 ALTER TABLE `department`
-  MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `designation`
 --
 ALTER TABLE `designation`
-  MODIFY `designation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `designation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `employees`
