@@ -31,7 +31,7 @@ const db = mysql.createPool({
 })
 
 
-app.post('/', (req, res) => {
+app.post('/employee', (req, res) => {
     console.log(req.body);
     const body = req.body
     const sql = "INSERT INTO employees (name, username, password, designation_id, department, create_date,update_date) VALUES(?,?,?,?,?,?,?)"
@@ -39,6 +39,7 @@ app.post('/', (req, res) => {
     db.query(sql, [body.name, body.username, body.password, body.designation, body.dept, body.createDate, body.updateDate], (err, result) => {
 
         console.log(err);
+        res.send(result)
 
     })
 })
@@ -186,4 +187,119 @@ app.get('/dept/:id', (req,res)=>{
             res.send(result);
             
             })
-    })    
+    })  
+    
+    app.get('/desigDept', (req,res)=>{
+        var ret = {};
+        var sql = "SELECT * FROM department"
+        db.query(sql ,(err,result)=>{
+        
+            if(err) console.log(err);
+            console.log("Res1 "+result)
+            ret.dept = result
+
+            sql = "SELECT * FROM designation"
+            db.query(sql ,(err,result)=>{
+        
+            if(err) console.log(err);
+            console.log("Res2 "+result)
+            ret.desig = result
+            console.log("Ret "+ret.dept[0])
+
+            res.send(ret); 
+            
+            })
+            })
+    })
+
+    app.get('/employee', (req, res) => {
+
+        const sql = "SELECT * FROM employees"
+    
+        db.query(sql, (err, result) => {
+    
+            res.send(result);
+    
+        })
+    
+    }) 
+    
+    app.delete('/employee/:id',(req,res)=>{
+
+        const id = req.params.id;
+        console.log('please Delete id from database : ', id)
+        const sql="DELETE FROM employees WHERE id=?"
+        
+        db.query(sql , [id] ,(err,result)=>{
+        
+        if(err) console.log(err);
+        
+        res.send(result);
+        
+        })
+        
+        })
+    app.get('/employee', (req, res)=>{
+        const id = req.params.id;
+        console.log('please get this id from database : ' , id)
+        const sql = "SELECT * FROM employees"
+        db.query(sql,  (err, result)=>{
+            if(err) console.log(err);
+            for(var obj in result){
+                console.log(result[obj])
+               console.log(obj)
+                res.send(result[obj]);    
+            }
+            //res.send(result);
+        })
+    })  
+    
+    // app.post('/employee/filter', (req, res)=>{    
+    //     console.log("req : "+req.body.desig);      
+    //     const sql = "SELECT * FROM employees where  designation_id = ?"
+    //     db.query(sql, [req.body.dept],  (err, result)=>{
+    //         if(err) console.log(err);
+    //         res.send(result);            
+    //     })
+    // }) 
+
+    app.post('/employee/filter', (req, res)=>{    
+        console.log("req filter : "+req);
+        console.log("req filter designation id : "+req.body.desigNew+ " req department id: "+ req.body.dept);
+        const  datas = req.body;     
+        const sql = "SELECT * FROM employees where department=? AND  designation_id = ?"
+        db.query(sql, [datas.dept, datas.desigNew],  (err, result)=>{
+            if(err) console.log(err);
+            res.send(result);            
+        })
+    })
+
+    
+    
+    app.post('/employee/filterDept', (req, res)=>{    
+        console.log("req : "+req.body.desig);      
+        const sql = "SELECT * FROM employees where department = ?"
+        db.query(sql, [req.body.dept],  (err, result)=>{
+            if(err) console.log(err);
+            res.send(result);            
+        })
+    })
+    
+    app.get('/employee/:id', (req,res)=>{
+        const id = req.params.id;
+        const sql = "SELECT * FROM employees WHERE id=?"
+        db.query(sql , [id] ,(err,result)=>{
+        
+            if(err) console.log(err);
+    
+            //var obj=null;
+           for(var obj in result){
+                console.log(result[obj])
+               console.log(obj)
+                res.send(result[obj]);    
+            }
+            //res.send(result);
+            
+            })
+       
+      })
