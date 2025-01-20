@@ -303,3 +303,43 @@ app.get('/dept/:id', (req,res)=>{
             })
        
       })
+
+    
+    //   app.put('/dept/:id',(req,res)=>{
+    //     const id = req.params.id;
+    //     console.log('Please Update this id from the database : ', id)
+    //     const body = req.body;
+    //     const sql = "UPDATE  department SET title=? WHERE department_id=? limit 1"
+    //     db.query(sql , [body.deptTitle, id] ,(err,result)=>{
+    
+    //         if(err) console.log(err);
+            
+    //         res.send(result);
+            
+    //         })
+    // }) 
+    
+    
+
+    // app.post('/employee', (req, res) => {
+    //     console.log(req.body);
+    //     const body = req.body
+    //     const sql = "INSERT INTO employees (name, username, password, designation_id, department, create_date,update_date) VALUES(?,?,?,?,?,?,?)"
+    
+    //     db.query(sql, [body.name, body.username, body.password, body.designation, body.dept, body.createDate, body.updateDate], (err, result) => {
+    
+    //         console.log(err);
+    //         res.send(result)
+    
+    //     })
+    // })
+
+    app.post('/employee/addAttendence', (req, res)=>{
+        const id = req.params.id;
+        const body =req.body;
+        const sql = "INSERT INTO Attendence ( employee_id, in_Time, out_Time) VALUES(?,?,?)"
+        db.query(sql, [body.id, body.inTime, body.outTime], (err,result)=>{
+            console.log(err);
+            res.send(result)
+        })
+    })  
