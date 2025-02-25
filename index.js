@@ -381,6 +381,14 @@ app.get('/attendence', (req, res) => {
 })
 
 
+app.post('/employee/totalAttendence', (req, res) => {
+    const sql = "select DATE_FORMAT(a.in_Time , '%Y-%m-%d') date, a.in_Time, a.out_Time, e.name from attendence a , employees e where a.employee_id = e.id;"
+    db.query(sql, (err, result) => {
+        res.send(result);
+    })
+})
+
+
 // app.post('/employee/filter', (req, res)=>{    
 //     console.log("req filter : "+req);
 //     console.log("req filter designation id : "+req.body.desigNew+ " req department id: "+ req.body.dept);
@@ -568,13 +576,13 @@ app.post('/employee/empSch', (req, res) => {
 //     })
 // })
 
-app.put('/employeeUpdSch/update', (req, res)=>{
+app.put('/employeeUpdSch/update', (req, res) => {
     // const id = req.params.id;
     // console.log('Please Update this Id from the database : ', id)
-    const body= req.body;
+    const body = req.body;
     const sql = "UPDATE employee_schedule SET Day_ID=?  WHERE employee_id=? AND Day_ID=?"
-    db.query(sql, [body.dayToBeChangedInto ,body.id, body. daySelected], (err, result)=>{
-        if(err) console.log(err);
+    db.query(sql, [body.dayToBeChangedInto, body.id, body.daySelected], (err, result) => {
+        if (err) console.log(err);
         res.send(result);
     })
 })
@@ -600,7 +608,7 @@ app.post("/employee/emptoday", (req, res) => {
 
 })
 
-app.post("/employee/nowEmp", (req, res)=>{
+app.post("/employee/nowEmp", (req, res) => {
     const body = req.body;
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 })
@@ -612,10 +620,11 @@ app.post("/employee/emp", (req, res) => {
     let sql = ""
 
     sql = "select  es.*, e.name  from employee_schedule es ,duty_hour dh, days d, employees e  where es.duty_hour_id= dh.duty_hour_id and es.Day_ID = d.id and es.employee_id=e.id   and d.name=?;"
+    
 
-
-    // const sql = "select es.Day_ID, es.employee_id, es.duty_hour_id, e.name, e.department, e.designation_id , d.name day_name , d3.title designation_title, d2.title department_title , dh.From_t , dh.To_t   from employee_schedule es, employees e, days d, department d2, designation d3,duty_hour dh where es.Day_ID = d.id and es.duty_hour_id=dh.duty_hour_id and es.employee_id = e.id and e.department = d2.department_id  and e.designation_id =d3.designation_id and d.name = 'Saturday'"
+    // const sql =  "select es.Day_ID, es.employee_id, es.duty_hour_id, e.name, e.department, e.designation_id , d.name day_name , d3.title designation_title, d2.title department_title , dh.From_t , dh.To_t   from employee_schedule es, employees e, days d, department d2, designation d3,duty_hour dh where es.Day_ID = d.id and es.duty_hour_id=dh.duty_hour_id and es.employee_id = e.id and e.department = d2.department_id  and e.designation_id =d3.designation_id and d.name = 'Saturday'"
     db.query(sql, [days[currentDay]], (err, result) => {
+        console.log("Employees that has matched" + result)
         res.send(result);
 
 
@@ -631,9 +640,9 @@ app.post("/employee/emp", (req, res) => {
 
 // })
 
-app.get('/empschedule', (req, res)=>{
+app.get('/empschedule', (req, res) => {
     const sql = "SELECT * FROM employee_schedule"
-    db.query(sql, (err,result)=>{
+    db.query(sql, (err, result) => {
         res.send(result);
     })
 })
@@ -655,12 +664,12 @@ app.get('/empschedule', (req, res)=>{
 //     })
 
 // })
-app.get('/empschedule/:id', (req, res)=>{
-    const id = req.params.id; 
+app.get('/empschedule/:id', (req, res) => {
+    const id = req.params.id;
     const sql = "SELECT * FROM employee_schedule WHERE id=?"
-    db.query(sql , [id], (err, result)=>{
-        if(err) console.log(err);
-        for(var obj in result){
+    db.query(sql, [id], (err, result) => {
+        if (err) console.log(err);
+        for (var obj in result) {
             console.log(result[obj])
             console.log(obj)
             res.send(result[obj]);
@@ -690,9 +699,9 @@ app.post("/employee/exchange", (req, res) => {
         res.send(result);
     })
 })
-app.post('/employee/depatmentBased', (req, res)=>{
+app.post('/employee/depatmentBased', (req, res) => {
     const sql = "select count(*) count, e.department, d.title from employees e, department d where e.department= d.department_id group by e.department ;"
-    db.query(sql, (err,result)=>{
+    db.query(sql, (err, result) => {
         console.log(result)
         res.send(result);
     })
@@ -706,6 +715,41 @@ app.post("/employee/matchedDeptEmp", (req, res) => {
         res.send(result);
     })
 })
+
+app.post("/employeeSearch", (req, res) => {
+    const body = req.body;
+    console.log("Search RESULT" + body.search)
+    const sql = "SELECT * FROM employees WHERE name LIKE CONCAT('%', ?, '%')"
+    db.query(sql, [body.search], (err, result) => {
+        console.log(result)
+        res.send(result);
+    })
+})
+
+app.post("/employeeIdSearch", (req, res) => {
+    // Use req.body instead of body
+    const { search } = req.body;
+
+    // SQL query using parameterized query to prevent SQL injection
+    const sql = "SELECT * FROM employees WHERE name LIKE CONCAT('%', ?, '%')";
+
+    db.query(sql, [search], (err, result) => {
+        if (err) {
+            console.error("Error executing query:", err);
+            // Send JSON error response
+            return res.status(500).json({ error: "Internal Server Error" });
+        }
+
+        // If no matching employee is found, you can send a message or an empty array.
+        if (result.length === 0) {
+            return res.status(404).json({ error: "No employee found" });
+        }
+
+        // Assuming you want to return the first match
+        const employee = result[0];
+        res.json({ id: employee.id, ...employee });
+    });
+});
 
 // app.post('/employee/dutyhour', (req, res)=>{
 //     const body = req.body;
@@ -736,14 +780,14 @@ app.post('/employee/checkIFtodayisTheDay', (req, res) => {
     // Get today's date in YYYY-MM-DD format
     const todayDate = currentDay.toISOString().split('T')[0];
 
-    console.log(todayDate); 
+    console.log(todayDate);
 
     // console.log(currentDay)
     const sql = "select *,(select e.name from employees e where e.id = se.Emp_for) employee_to_be_switch,(select e.name from employees e where e.id = se.Emp_with) employee_to_be_switch_with  from schedule_exchange se where se.Exchange_date =?"
     db.query(sql, [todayDate], (err, result) => {
         console.log(result)
         res.send(result);
-        console.log("This is the Latest Result "+result);
+        console.log("This is the Latest Result " + result);
     })
 })
 
@@ -770,23 +814,23 @@ app.post('/employee/checkIFtodayisTheDay', (req, res) => {
 //         res.send(result);
 //     })
 // })
- 
+
 // app.post('/attendence/countTotatlAbs', (req, res)=>{
 //     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 //     const currentDay = new Date().getDay();
 
 // })
 
-app.post('/attendence/totalpresent', (req,res)=>{
+app.post('/attendence/totalpresent', (req, res) => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const currentDay = new Date();
 
     // Get today's date in YYYY-MM-DD format
     const todayDate = currentDay.toISOString().split('T')[0];
 
-    console.log(todayDate); 
-    const sql = "SELECT COUNT(*) count  FROM attendence a JOIN employees e ON a.employee_id = e.id WHERE CAST(a.in_Time AS DATE) = ?" 
-    db.query(sql, [todayDate], (err, result)=>{
+    console.log(todayDate);
+    const sql = "SELECT COUNT(*) count  FROM attendence a JOIN employees e ON a.employee_id = e.id WHERE CAST(a.in_Time AS DATE) = ?"
+    db.query(sql, [todayDate], (err, result) => {
         console.log(result)
         res.send(result)
 
@@ -795,9 +839,9 @@ app.post('/attendence/totalpresent', (req,res)=>{
 })
 
 
-app.post('/attendence/totalemployees', (req, res)=>{
-    const sql  = "select count(e.id) count  from employees e";
-    db.query(sql, (err, result)=>{
+app.post('/attendence/totalemployees', (req, res) => {
+    const sql = "select count(e.id) count  from employees e";
+    db.query(sql, (err, result) => {
         console.log(result)
         res.send(result)
     })
@@ -847,34 +891,66 @@ app.post('/attendence/totalemployees', (req, res)=>{
 // })
 
 
-app.post('/employee/allinfo', (req,res)=>{
+app.post('/employee/allinfo', (req, res) => {
     // const id = req.params.id;
-    
+
     const { id } = req.body;
-    console.log("Show This Id" ,id)
-    const sql = "select e.name employee_name, e.username, d2.title department_title, d3.title designation_title,d.name day,dh.From_t,  dh.To_t, dayname(a.in_Time) as Attendence_Day, date(a.in_Time)as date_of_attendendence, a.in_Time, a.out_Time  from employee_schedule es, days d, duty_hour dh, attendence a, employees e, department d2, designation d3 where es.employee_id =? and es.Day_ID= d.id and es.duty_hour_id=dh.duty_hour_id and es.employee_id= a.employee_id and es.employee_id=e.id and e.department=d2.department_id and e.designation_id=d3.designation_id ;"
-    db.query(sql, [id], (err, result)=>{
+    console.log("Show This Id", id)
+    const sql = "select e.name employee_name,  e.username, d2.title department_title, d3.title designation_title from   employees e, department d2, designation d3 where e.id =?   and  e.department=d2.department_id and e.designation_id=d3.designation_id"
+    db.query(sql, [id], (err, result) => {
         // console.log(result)
         res.send(result)
     })
 })
 
 
-app.post('/employee/allscheduleofEmp', (req, res)=>{
-    const {id} = req.body;
-    const sql = "select dh.From_t , dh.To_t, d.name from employee_schedule es, duty_hour dh,days d where es.duty_hour_id =dh.duty_hour_id and dh.day_id=d.id and es.employee_id =?;"
-    db.query(sql, [id], (err, result)=>{
+app.post('/employee/allscheduleofEmp', (req, res) => {
+    const { id } = req.body;
+    const sql = "select d.name name, dh.From_t From_t, dh.To_t To_t from employee_schedule es, days d, duty_hour dh where es.Day_ID= d.id and es.duty_hour_id=dh.duty_hour_id and es.employee_id =? ;"
+    db.query(sql, [id], (err, result) => {
         res.send(result)
     })
 })
 
-app.post('/employee/allAttendence', (req, res)=>{
-    const {id}= req.body;
-    const sql = "select dayname(a.in_Time) day_of_attendence,a.in_Time, a.out_Time  from attendence a, employees e where a.employee_id=e.id   and e.id =? ;"
-    db.query(sql, [id], (err,result)=>{
+app.post('/employee/allAttendence', (req, res) => {
+    const body = req.body;
+    const sql = "select dayname(a.in_Time) day_of_attendence,a.in_Time, a.out_Time  from attendence a, employees e where a.employee_id=e.id   and e.id = ? and  MONTHNAME(a.in_Time)=?;"
+    db.query(sql, [body.id, body.month], (err, result) => {
         res.send(result)
     })
 })
+
+app.post('/employee/allscheduleExch', (req, res) => {
+    const { id } = req.body;
+    const sql = "select DATE_FORMAT(se.Exchange_date , '%Y-%m-%d') exchanged_date,(select e.name from employees e where e.id = se.Emp_for) employee_to_be_switch,(select e.name from employees e where e.id = se.Emp_with) employee_to_be_switch_with  from schedule_exchange se where se.Emp_for = ?;"
+    db.query(sql, [id], (err, result) => {
+        res.send(result)
+    })
+})
+
+
+// app.put('/employeeUpdSch/update', (req, res)=>{
+//     // const id = req.params.id;
+//     // console.log('Please Update this Id from the database : ', id)
+//     const body= req.body;
+//     const sql = "UPDATE employee_schedule SET Day_ID=?  WHERE employee_id=? AND Day_ID=?"
+//     db.query(sql, [body.dayToBeChangedInto ,body.id, body. daySelected], (err, result)=>{
+//         if(err) console.log(err);
+//         res.send(result);
+//     })
+// })
+app.post('/employee/totalWorkHour', (req, res) => {
+    const body = req.body;
+    // const {id} = req.body;
+    const sql = "select *,MONTHNAME(a.in_Time) Month_name,  SUM(TIMESTAMPDIFF(HOUR, a.in_Time , a.out_Time)) AS total_hours  from attendence a, employees e where a.employee_id=e.id and e.id =? and MONTHNAME(a.in_Time)=?;"
+    db.query(sql, [body.id, body.month], (err, result) => {
+        if (err) console.log(err)
+        res.send(result);
+    })
+
+})
+
+
 
 
 
